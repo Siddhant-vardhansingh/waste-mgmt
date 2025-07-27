@@ -27,7 +27,7 @@ export default function Dashboard() {
   const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [itemsData, setItemsData] = useState<any[]>([]);
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: number }>(
-    {}
+    {},
   );
   const [pickupDate, setPickupDate] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -43,7 +43,7 @@ export default function Dashboard() {
     const fetchStateDistricts = async () => {
       try {
         const res = await fetch(
-          "https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json"
+          "https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json",
         );
         const json = await res.json();
         const states = json.states;
@@ -156,7 +156,7 @@ export default function Dashboard() {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       alert("Order created successfully!");
       setShowCreateOrder(false);
@@ -328,7 +328,7 @@ export default function Dashboard() {
                   {selectedCategory &&
                     (
                       itemsData.find(
-                        (cat: any) => cat.category === selectedCategory
+                        (cat: any) => cat.category === selectedCategory,
                       )?.items || []
                     ).map((item: string) => (
                       <option key={item} value={item}>
