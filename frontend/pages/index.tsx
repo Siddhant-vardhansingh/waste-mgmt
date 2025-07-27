@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import axios from "axios";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -57,7 +57,7 @@ export default function Home() {
     const fetchStateDistricts = async () => {
       try {
         const res = await fetch(
-          "https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json",
+          "https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json"
         );
         const json = await res.json();
         const states = json.states;
@@ -78,7 +78,7 @@ export default function Home() {
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({
       ...formData,
@@ -87,7 +87,7 @@ export default function Home() {
   };
 
   const handleEditFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setEditFormData({
       ...editFormData,
@@ -96,7 +96,7 @@ export default function Home() {
   };
 
   const handleEditVendorFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setEditVendorFormData({
       ...editVendorFormData,
@@ -207,10 +207,9 @@ export default function Home() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
-      console.log("User updated:", response.data);
       setError("User updated successfully!");
       setShowEditForm(false);
     } catch (err: any) {
@@ -248,10 +247,9 @@ export default function Home() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
-      console.log("Vendor updated:", response.data);
       setError("Vendor updated successfully!");
       setShowEditVendorForm(false);
     } catch (err: any) {
@@ -275,12 +273,12 @@ export default function Home() {
             {
               email: formData.email,
               password: formData.password,
-            },
+            }
           );
           localStorage.setItem("token", response.data.access_token);
           localStorage.setItem(
             "username",
-            response.data.name || formData.username,
+            response.data.name || formData.username
           );
           localStorage.setItem("userType", response.data.role);
           localStorage.setItem("email", response.data.email);
@@ -292,7 +290,7 @@ export default function Home() {
             {
               username: formData.username,
               password: formData.password,
-            },
+            }
           );
           localStorage.setItem("token", response.data.access_token);
           localStorage.setItem("username", formData.username);
@@ -312,7 +310,7 @@ export default function Home() {
           };
           const response = await axios.post(
             `http://localhost:8001/vendor/signup`,
-            signupData,
+            signupData
           );
           // No token to store
           setIsLogin(true); // Switch to login form
@@ -329,7 +327,7 @@ export default function Home() {
           };
           const response = await axios.post(
             `http://localhost:8001/user/signup`,
-            signupData,
+            signupData
           );
           // No token to store
           setIsLogin(true); // Switch to login form
@@ -992,7 +990,7 @@ export default function Home() {
                             <option key={district} value={district}>
                               {district}
                             </option>
-                          ),
+                          )
                         )}
                       </select>
                     </div>
