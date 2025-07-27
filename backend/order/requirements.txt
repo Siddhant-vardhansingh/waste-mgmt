@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pymysql
+python-dotenv
+cryptography
+requests
+
+# Optional for background tasks and async DB ORM
+# celery
+# redis
+# databases
+# tortoise-orm

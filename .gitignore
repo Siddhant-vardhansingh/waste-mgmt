@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.env
+*.sqlite3
+*.db
+
+# macOS
+.DS_Store
+
+# Docker
+docker/mysql_data/
+
+# Node.js/Next.js
+frontend/node_modules/
+frontend/.next
+
+# Logs
+*.log
+logs/
+frontend/.eslintcache
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test/coverage
+coverage/
+*.cover
+*.coverage
+*.egg-info/
+dist/
+build/

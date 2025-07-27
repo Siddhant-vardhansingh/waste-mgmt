@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: waste_mgmt
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend-auth:
+    build: ./backend/auth
+    container_name: backend_auth
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://user:userpass@mysql:3306/waste_mgmt
+    ports:
+      - "8001:8000"
+
+  backend-order:
+    build: ./backend/order
+    container_name: backend_order
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://user:userpass@mysql:3306/waste_mgmt
+    ports:
+      - "8002:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend-auth
+      - backend-order
+
+volumes:
+  mysql_data:
