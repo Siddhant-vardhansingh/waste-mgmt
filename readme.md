@@ -1,6 +1,6 @@
 # Waste Management Platform
 
-A full-stack waste management platform built with FastAPI (Python), Next.js (React), and MySQL.  
+A full-stack waste management platform built with FastAPI (Python), Next.js (React), and MySQL.
 Includes authentication, order management, and a modern frontend.
 
 ## Project Structure
@@ -88,7 +88,7 @@ MIT
 
 ---
 
-**To contribute:**  
+**To contribute:**
 Fork the repo, create a branch, and submit a pull request.
 
 ## Contributing
