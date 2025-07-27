@@ -54,6 +54,7 @@ class Order(Base):
     quantity = Column(Float)
     pickup_date = Column(DateTime)
     order_date = Column(DateTime)
+    pickup_address = Column(String(255))
 
 
 Base.metadata.create_all(bind=engine)
@@ -157,6 +158,7 @@ def get_items():
 class OrderRequest(BaseModel):
     items: dict[str, float]  # Key: item name, Value: quantity
     pickup_date: datetime
+    pickup_address: str
 
 
 @app.post("/order")
@@ -189,6 +191,7 @@ def create_order(
             quantity=quantity,
             pickup_date=order.pickup_date,
             order_date=datetime.utcnow(),
+            pickup_address=order.pickup_address
         )
         db.add(order_entry)
         db.flush()  # Get order_entry.id before commit
@@ -199,6 +202,7 @@ def create_order(
                 "quantity": quantity,
                 "pickup_date": order.pickup_date,
                 "order_date": datetime.utcnow(),
+                "pickup_address":order.pickup_address
             }
         )
     try:
@@ -239,6 +243,7 @@ def get_orders(
                 "pickup_date": order.pickup_date,
                 "order_date": order.order_date,
                 "user_name": order.user_name,
+                "pickup_address": order.pickup_address
             }
         )
     return {"status": "success", "orders": result}
