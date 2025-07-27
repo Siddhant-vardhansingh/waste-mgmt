@@ -1,9 +1,9 @@
 from typing import Dict
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import create_engine, Column, String, Integer, DateTime, Float
+from sqlalchemy import create_engine, Column, String, DateTime, Float
 from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 import requests
@@ -17,7 +17,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-
 # Getting Current User
 def get_current_user(authorization: str = Header(...)):
     # Expect header: Authorization: Bearer <token>
@@ -25,16 +24,12 @@ def get_current_user(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Invalid authorization header")
     token = authorization.split(" ", 1)[1]
     response = requests.get(
-        "http://backend-auth:8000/user/me",
-        headers={"Authorization": f"Bearer {token}"}
+        "http://backend-auth:8000/user/me", headers={"Authorization": f"Bearer {token}"}
     )
     if response.status_code != 200:
         raise HTTPException(status_code=401, detail="Invalid token")
     return response.json()
 
-# Order creation request model
-class OrderRequest(BaseModel):
-    items: dict[str, int]  # Key: item name, Value: quantity
 
 app = FastAPI(title="Order Service")
 
@@ -46,6 +41,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Waste order model
 class Order(Base):
@@ -59,7 +55,10 @@ class Order(Base):
     pickup_date = Column(DateTime)
     order_date = Column(DateTime)
 
+
 Base.metadata.create_all(bind=engine)
+
+
 # Dependency to get DB session
 def get_db():
     db = SessionLocal()
@@ -68,10 +67,12 @@ def get_db():
     finally:
         db.close()
 
+
 # Root endpoint
 @app.get("/")
 def read_root():
     return {"message": "Order Service Running"}
+
 
 @app.get("/items")
 def get_items():
@@ -90,8 +91,8 @@ def get_items():
                         "Old pressure cookers",
                         "Non-stick pans",
                         "Bicycle parts",
-                        "Rusty nails, screws, bolts"
-                    ]
+                        "Rusty nails, screws, bolts",
+                    ],
                 },
                 {
                     "category": "Plastics",
@@ -101,8 +102,8 @@ def get_items():
                         "Plastic jars and containers",
                         "Old plastic buckets or mugs",
                         "Broken plastic furniture",
-                        "PET bottles"
-                    ]
+                        "PET bottles",
+                    ],
                 },
                 {
                     "category": "Paper Products",
@@ -112,8 +113,8 @@ def get_items():
                         "Used notebooks",
                         "Cardboard boxes",
                         "Old books",
-                        "Paper packaging"
-                    ]
+                        "Paper packaging",
+                    ],
                 },
                 {
                     "category": "Glass Items",
@@ -121,8 +122,8 @@ def get_items():
                         "Broken glass bottles",
                         "Empty sauce or pickle jars",
                         "Old mirrors",
-                        "Window panes"
-                    ]
+                        "Window panes",
+                    ],
                 },
                 {
                     "category": "Electronics and E-Waste",
@@ -133,8 +134,8 @@ def get_items():
                         "Defunct TVs and radios",
                         "Old computer parts",
                         "Electric irons",
-                        "Tube lights and CFLs"
-                    ]
+                        "Tube lights and CFLs",
+                    ],
                 },
                 {
                     "category": "Miscellaneous",
@@ -143,11 +144,11 @@ def get_items():
                         "Discarded footwear",
                         "Old toys",
                         "Used Tupperware",
-                        "Broken umbrellas"
-                    ]
-                }
+                        "Broken umbrellas",
+                    ],
+                },
             ]
-        }
+        },
     }
     return JSONResponse(scrap_data)
 
@@ -157,11 +158,12 @@ class OrderRequest(BaseModel):
     items: dict[str, float]  # Key: item name, Value: quantity
     pickup_date: datetime
 
+
 @app.post("/order")
 def create_order(
     order: OrderRequest,
     db: Session = Depends(get_db),
-    current_user: Dict = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user),
 ):
     user = current_user.get("sub")
     user_id = current_user.get("user_id")
@@ -177,20 +179,31 @@ def create_order(
     created_items = []
     for item_type, quantity in order.items.items():
         if not isinstance(quantity, float) or quantity <= 0:
-            raise HTTPException(status_code=422, detail=f"Invalid quantity for {item_type}")
-        order_entry = Order(user_name=user, user_id=user_id_bytes, item_type=item_type, quantity=quantity, pickup_date=order.pickup_date, order_date=datetime.utcnow())
+            raise HTTPException(
+                status_code=422, detail=f"Invalid quantity for {item_type}"
+            )
+        order_entry = Order(
+            user_name=user,
+            user_id=user_id_bytes,
+            item_type=item_type,
+            quantity=quantity,
+            pickup_date=order.pickup_date,
+            order_date=datetime.utcnow(),
+        )
         db.add(order_entry)
         db.flush()  # Get order_entry.id before commit
-        created_items.append({
-            "order_id": str(UUID(bytes=order_entry.id)),
-            "item_type": item_type,
-            "quantity": quantity,
-            "pickup_date": order.pickup_date,
-            "order_date": datetime.utcnow()
-        })
+        created_items.append(
+            {
+                "order_id": str(UUID(bytes=order_entry.id)),
+                "item_type": item_type,
+                "quantity": quantity,
+                "pickup_date": order.pickup_date,
+                "order_date": datetime.utcnow(),
+            }
+        )
     try:
         db.commit()
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
@@ -198,14 +211,13 @@ def create_order(
         "status": "success",
         "message": "Order created successfully",
         "user_id": user_id,
-        "items": created_items
+        "items": created_items,
     }
 
 
 @app.get("/orders")
 def get_orders(
-    db: Session = Depends(get_db),
-    current_user: Dict = Depends(get_current_user)
+    db: Session = Depends(get_db), current_user: Dict = Depends(get_current_user)
 ):
     user_id = current_user.get("user_id")
     if not user_id:
@@ -219,15 +231,14 @@ def get_orders(
     orders = db.query(Order).filter(Order.user_id == user_id_bytes).all()
     result = []
     for order in orders:
-        result.append({
-            "order_id": str(UUID(bytes=order.id)),
-            "item_type": order.item_type,
-            "quantity": order.quantity,
-            "pickup_date": order.pickup_date,
-            "order_date": order.order_date,
-            "user_name": order.user_name
-        })
-    return {
-        "status": "success",
-        "orders": result
-    }
+        result.append(
+            {
+                "order_id": str(UUID(bytes=order.id)),
+                "item_type": order.item_type,
+                "quantity": order.quantity,
+                "pickup_date": order.pickup_date,
+                "order_date": order.order_date,
+                "user_name": order.user_name,
+            }
+        )
+    return {"status": "success", "orders": result}

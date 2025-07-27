@@ -1,0 +1,33 @@
+name: pre-commit
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Python linting/formatting
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Python dependencies
+        run: pip install pre-commit black flake8
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files
+
+      # Node.js linting/formatting (frontend)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install frontend dependencies
+        run: cd frontend && npm install --legacy-peer-deps
+      - name: Run ESLint
+        run: cd frontend && npx eslint .

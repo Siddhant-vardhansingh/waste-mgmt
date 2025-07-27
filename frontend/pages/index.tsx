@@ -1,179 +1,189 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import axios from "axios";
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(true);
   const [isVendor, setIsVendor] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    email: '',
-    gender: '',
-    mobile: '',
-    address: ''
+    username: "",
+    password: "",
+    email: "",
+    gender: "",
+    mobile: "",
+    address: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userType, setUserType] = useState('');
+  const [userType, setUserType] = useState("");
   const [showEditForm, setShowEditForm] = useState(false);
   const [editFormData, setEditFormData] = useState({
-    username: '',
-    password: '',
-    email: '',
-    mobile: '',
-    gender: ''
+    username: "",
+    password: "",
+    email: "",
+    mobile: "",
+    gender: "",
   });
   const [showEditVendorForm, setShowEditVendorForm] = useState(false);
   const [editVendorFormData, setEditVendorFormData] = useState({
-    name: '',
-    password: '',
-    email: '',
-    mobile: '',
-    gender: '',
-    address: ''
+    name: "",
+    password: "",
+    email: "",
+    mobile: "",
+    gender: "",
+    address: "",
   });
   const router = useRouter();
 
   useEffect(() => {
     // Check if user is logged in
-    const token = localStorage.getItem('token');
-    const storedUserType = localStorage.getItem('userType');
+    const token = localStorage.getItem("token");
+    const storedUserType = localStorage.getItem("userType");
     if (token) {
       setIsLoggedIn(true);
-      setUserType(storedUserType || '');
+      setUserType(storedUserType || "");
     }
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleEditFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setEditFormData({
       ...editFormData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleEditVendorFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleEditVendorFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setEditVendorFormData({
       ...editVendorFormData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleEditUser = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const role = localStorage.getItem('userType');
-      const username = localStorage.getItem('username');
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("userType");
+      const username = localStorage.getItem("username");
       if (!token) {
-        setError('Please login first');
+        setError("Please login first");
         return;
       }
       if (!username) {
-        setError('Username not found');
+        setError("Username not found");
         return;
       }
       // Only support can edit anyone, regular users can edit themselves
-      let formUsername = '';
-      if (role === 'support_user') {
-        formUsername = '';
+      let formUsername = "";
+      if (role === "support_user") {
+        formUsername = "";
       } else {
         formUsername = username;
       }
       setShowEditForm(true);
       setEditFormData({
         username: formUsername,
-        password: '',
-        email: '',
-        mobile: '',
-        gender: ''
+        password: "",
+        email: "",
+        mobile: "",
+        gender: "",
       });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load user data');
+      setError(err.response?.data?.message || "Failed to load user data");
     }
   };
 
   const handleEditVendor = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const vendorEmail = localStorage.getItem('email');
-      const role = localStorage.getItem('userType');
+      const token = localStorage.getItem("token");
+      const vendorEmail = localStorage.getItem("email");
+      const role = localStorage.getItem("userType");
       if (!token) {
-        setError('Please login first');
+        setError("Please login first");
         return;
       }
       if (!vendorEmail) {
-        setError('Vendor email not found');
+        setError("Vendor email not found");
         return;
       }
       // Permission: vendor can edit self, or support_vendor can edit any
-      const currentVendorEmail = localStorage.getItem('email');
-      const canEdit = currentVendorEmail === vendorEmail || role === 'support_vendor';
+      const currentVendorEmail = localStorage.getItem("email");
+      const canEdit =
+        currentVendorEmail === vendorEmail || role === "support_vendor";
       if (!canEdit) {
-        setError('You do not have permission to edit this vendor');
+        setError("You do not have permission to edit this vendor");
         return;
       }
       setShowEditVendorForm(true);
       // Set name based on role and currentVendorName
-      let formEmail = '';
-      if (role === 'support_vendor') {
-        formEmail = '';
+      let formEmail = "";
+      if (role === "support_vendor") {
+        formEmail = "";
       } else if (currentVendorEmail === vendorEmail) {
         formEmail = vendorEmail;
       }
       setEditVendorFormData({
-        name: '',
-        password: '',
+        name: "",
+        password: "",
         email: formEmail,
-        mobile: '',
-        gender: '',
-        address: ''
+        mobile: "",
+        gender: "",
+        address: "",
       });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load vendor data');
+      setError(err.response?.data?.message || "Failed to load vendor data");
     }
   };
 
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const token = localStorage.getItem('token');
-      const currentUsername = localStorage.getItem('username');
-      const role = localStorage.getItem('userType');
-      
+      const token = localStorage.getItem("token");
+      const currentUsername = localStorage.getItem("username");
+      const role = localStorage.getItem("userType");
+
       // Determine which username to use in query params
       let queryUsername = currentUsername;
-      if (role === 'support_user') {
+      if (role === "support_user") {
         queryUsername = editFormData.username;
       }
 
-      const response = await axios.put(`http://localhost:8001/user/edit?username=${queryUsername}`, {
-        password: editFormData.password,
-        email: editFormData.email,
-        mobile: editFormData.mobile,
-        gender: editFormData.gender
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.put(
+        `http://localhost:8001/user/edit?username=${queryUsername}`,
+        {
+          password: editFormData.password,
+          email: editFormData.email,
+          mobile: editFormData.mobile,
+          gender: editFormData.gender,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-      console.log('User updated:', response.data);
-      setError('User updated successfully!');
+      console.log("User updated:", response.data);
+      setError("User updated successfully!");
       setShowEditForm(false);
-      
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update user data');
+      setError(err.response?.data?.message || "Failed to update user data");
     } finally {
       setLoading(false);
     }
@@ -182,35 +192,39 @@ export default function Home() {
   const handleSubmitEditVendor = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
     try {
-      const token = localStorage.getItem('token');
-      const currentVendorEmail = localStorage.getItem('email');
-      const role = localStorage.getItem('userType');
-      
+      const token = localStorage.getItem("token");
+      const currentVendorEmail = localStorage.getItem("email");
+      const role = localStorage.getItem("userType");
+
       // Determine which email to use in query params
       let queryEmail = currentVendorEmail;
-      if (role === 'support_vendor') {
+      if (role === "support_vendor") {
         queryEmail = editVendorFormData.email;
       }
 
-      const response = await axios.put(`http://localhost:8001/vendor/edit?email=${queryEmail}`, {
-        password: editVendorFormData.password,
-        name: editVendorFormData.name,
-        mobile: editVendorFormData.mobile,
-        gender: editVendorFormData.gender,
-        address: editVendorFormData.address
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      console.log('Vendor updated:', response.data);
-      setError('Vendor updated successfully!');
+      const response = await axios.put(
+        `http://localhost:8001/vendor/edit?email=${queryEmail}`,
+        {
+          password: editVendorFormData.password,
+          name: editVendorFormData.name,
+          mobile: editVendorFormData.mobile,
+          gender: editVendorFormData.gender,
+          address: editVendorFormData.address,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      console.log("Vendor updated:", response.data);
+      setError("Vendor updated successfully!");
       setShowEditVendorForm(false);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update vendor data');
+      setError(err.response?.data?.message || "Failed to update vendor data");
     } finally {
       setLoading(false);
     }
@@ -219,34 +233,40 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       if (isLogin) {
         if (isVendor) {
           // Vendor Login: use email and password
-          const response = await axios.post(`http://localhost:8001/vendor/login`, {
-            email: formData.email,
-            password: formData.password
-          });
-          localStorage.setItem('token', response.data.access_token);
-          localStorage.setItem(
-            'username',
-            response.data.name || formData.username
+          const response = await axios.post(
+            `http://localhost:8001/vendor/login`,
+            {
+              email: formData.email,
+              password: formData.password,
+            },
           );
-          localStorage.setItem('userType', response.data.role);
-          localStorage.setItem('email', response.data.email);
-          router.push('/dashboard');
+          localStorage.setItem("token", response.data.access_token);
+          localStorage.setItem(
+            "username",
+            response.data.name || formData.username,
+          );
+          localStorage.setItem("userType", response.data.role);
+          localStorage.setItem("email", response.data.email);
+          router.push("/dashboard");
         } else {
           // User Login: use username and password
-          const response = await axios.post(`http://localhost:8001/user/login`, {
-            username: formData.username,
-            password: formData.password
-          });
-          localStorage.setItem('token', response.data.access_token);
-          localStorage.setItem('username', formData.username);
-          localStorage.setItem('userType', response.data.role);
-          router.push('/dashboard');
+          const response = await axios.post(
+            `http://localhost:8001/user/login`,
+            {
+              username: formData.username,
+              password: formData.password,
+            },
+          );
+          localStorage.setItem("token", response.data.access_token);
+          localStorage.setItem("username", formData.username);
+          localStorage.setItem("userType", response.data.role);
+          router.push("/dashboard");
         }
       } else {
         if (isVendor) {
@@ -257,12 +277,15 @@ export default function Home() {
             gender: formData.gender,
             mobile: formData.mobile,
             address: formData.address,
-            password: formData.password
+            password: formData.password,
           };
-          const response = await axios.post(`http://localhost:8001/vendor/signup`, signupData);
+          const response = await axios.post(
+            `http://localhost:8001/vendor/signup`,
+            signupData,
+          );
           // No token to store
           setIsLogin(true); // Switch to login form
-          setError('Signup successful! Please log in.');
+          setError("Signup successful! Please log in.");
           // Remove router.push("/login") - no such route exists
         } else {
           // User Signup
@@ -271,24 +294,27 @@ export default function Home() {
             email: formData.email,
             gender: formData.gender,
             mobile: formData.mobile,
-            password: formData.password
+            password: formData.password,
           };
-          const response = await axios.post(`http://localhost:8001/user/signup`, signupData);
+          const response = await axios.post(
+            `http://localhost:8001/user/signup`,
+            signupData,
+          );
           // No token to store
           setIsLogin(true); // Switch to login form
-          setError('Signup successful! Please log in.');
+          setError("Signup successful! Please log in.");
           // Remove router.push("/login") - no such route exists
         }
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'An error occurred');
+      setError(err.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoToDashboard = () => {
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   return (
@@ -297,9 +323,13 @@ export default function Home() {
       <header className="w-full sticky top-0 z-20 bg-white/80 backdrop-blur shadow-md flex flex-col md:flex-row items-center justify-between px-8 py-4 mb-8">
         <div className="flex items-center gap-3">
           <span className="text-green-600 text-3xl">♻️</span>
-          <span className="text-2xl font-extrabold text-indigo-700 tracking-tight">EcoWaste</span>
+          <span className="text-2xl font-extrabold text-indigo-700 tracking-tight">
+            EcoWaste
+          </span>
         </div>
-        <div className="mt-2 md:mt-0 text-indigo-600 font-semibold text-lg">Empowering a Cleaner Tomorrow</div>
+        <div className="mt-2 md:mt-0 text-indigo-600 font-semibold text-lg">
+          Empowering a Cleaner Tomorrow
+        </div>
       </header>
 
       {/* Main Content: Two-column layout */}
@@ -308,9 +338,16 @@ export default function Home() {
         <div className="hidden md:flex flex-col items-center justify-center flex-1 animate-fade-in">
           <div className="bg-gradient-to-br from-green-100 via-blue-100 to-indigo-100 rounded-3xl shadow-xl p-8 flex flex-col items-center border border-indigo-100">
             <span className="text-green-500 text-7xl mb-4">🌱</span>
-            <h2 className="text-2xl font-bold text-indigo-800 mb-2 text-center">Join the Movement for a Greener Planet</h2>
-            <p className="text-gray-700 text-center text-lg mb-2">Every small step in waste management leads to a cleaner, healthier world. Sign up or log in to make a difference today!</p>
-            <blockquote className="italic text-indigo-600 mt-2 text-center text-base">“The Earth is what we all have in common.”</blockquote>
+            <h2 className="text-2xl font-bold text-indigo-800 mb-2 text-center">
+              Join the Movement for a Greener Planet
+            </h2>
+            <p className="text-gray-700 text-center text-lg mb-2">
+              Every small step in waste management leads to a cleaner, healthier
+              world. Sign up or log in to make a difference today!
+            </p>
+            <blockquote className="italic text-indigo-600 mt-2 text-center text-base">
+              “The Earth is what we all have in common.”
+            </blockquote>
           </div>
         </div>
         {/* Right: Auth Card */}
@@ -321,7 +358,9 @@ export default function Home() {
                 Waste Management
               </h1>
               <p className="text-gray-600">
-                {isLogin ? 'Welcome back! Please sign in.' : 'Create your account'}
+                {isLogin
+                  ? "Welcome back! Please sign in."
+                  : "Create your account"}
               </p>
             </div>
             {/* Top Action Buttons */}
@@ -334,22 +373,24 @@ export default function Home() {
                   Dashboard
                 </button>
               )}
-              {isLoggedIn && (userType === 'user' || userType === 'support_user') && (
-                <button
-                  onClick={handleEditUser}
-                  className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-all shadow-lg font-semibold tracking-wide"
-                >
-                  Edit User
-                </button>
-              )}
-              {isLoggedIn && (userType === 'vendor' || userType === 'support_vendor') && (
-                <button
-                  onClick={handleEditVendor}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg font-semibold tracking-wide"
-                >
-                  Edit Vendor
-                </button>
-              )}
+              {isLoggedIn &&
+                (userType === "user" || userType === "support_user") && (
+                  <button
+                    onClick={handleEditUser}
+                    className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-all shadow-lg font-semibold tracking-wide"
+                  >
+                    Edit User
+                  </button>
+                )}
+              {isLoggedIn &&
+                (userType === "vendor" || userType === "support_vendor") && (
+                  <button
+                    onClick={handleEditVendor}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg font-semibold tracking-wide"
+                  >
+                    Edit Vendor
+                  </button>
+                )}
             </div>
 
             {/* User Type Toggle - Large pill with icons */}
@@ -359,17 +400,31 @@ export default function Home() {
                   type="button"
                   onClick={() => setIsVendor(false)}
                   className={`flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-                    ${!isVendor ? 'bg-blue-600 text-white shadow' : 'text-blue-600 hover:bg-blue-200'}`}
+                    ${
+                      !isVendor
+                        ? "bg-blue-600 text-white shadow"
+                        : "text-blue-600 hover:bg-blue-200"
+                    }`}
                 >
-                  <span role="img" aria-label="User">👤</span> User
+                  <span role="img" aria-label="User">
+                    👤
+                  </span>{" "}
+                  User
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsVendor(true)}
                   className={`flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-                    ${isVendor ? 'bg-blue-600 text-white shadow' : 'text-blue-600 hover:bg-blue-200'}`}
+                    ${
+                      isVendor
+                        ? "bg-blue-600 text-white shadow"
+                        : "text-blue-600 hover:bg-blue-200"
+                    }`}
                 >
-                  <span role="img" aria-label="Vendor">🏢</span> Vendor
+                  <span role="img" aria-label="Vendor">
+                    🏢
+                  </span>{" "}
+                  Vendor
                 </button>
               </div>
             </div>
@@ -381,7 +436,11 @@ export default function Home() {
                   type="button"
                   onClick={() => setIsLogin(true)}
                   className={`flex-1 min-w-[100px] px-5 py-2 rounded-l-lg text-base font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
-                    ${isLogin ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-100'}`}
+                    ${
+                      isLogin
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-gray-700 hover:bg-indigo-100"
+                    }`}
                 >
                   Login
                 </button>
@@ -389,7 +448,11 @@ export default function Home() {
                   type="button"
                   onClick={() => setIsLogin(false)}
                   className={`flex-1 min-w-[100px] px-5 py-2 rounded-r-lg text-base font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
-                    ${!isLogin ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-100'}`}
+                    ${
+                      !isLogin
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-gray-700 hover:bg-indigo-100"
+                    }`}
                 >
                   Sign Up
                 </button>
@@ -400,7 +463,10 @@ export default function Home() {
             {showEditVendorForm ? (
               <form onSubmit={handleSubmitEditVendor} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Name
                   </label>
                   <input
@@ -412,11 +478,16 @@ export default function Home() {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter the vendor name"
-                    disabled={localStorage.getItem('userType') !== 'support_vendor'}
+                    disabled={
+                      localStorage.getItem("userType") !== "support_vendor"
+                    }
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </label>
                   <input
@@ -431,7 +502,10 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Email
                   </label>
                   <input
@@ -443,11 +517,16 @@ export default function Home() {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter the email"
-                    disabled={localStorage.getItem('userType') !== 'support_vendor'}
+                    disabled={
+                      localStorage.getItem("userType") !== "support_vendor"
+                    }
                   />
                 </div>
                 <div>
-                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="mobile"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Mobile
                   </label>
                   <input
@@ -463,7 +542,10 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Gender
                   </label>
                   <select
@@ -481,7 +563,10 @@ export default function Home() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Address
                   </label>
                   <input
@@ -507,14 +592,30 @@ export default function Home() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Updating vendor...
                     </span>
                   ) : (
-                    'Update Vendor'
+                    "Update Vendor"
                   )}
                 </button>
                 <button
@@ -528,7 +629,10 @@ export default function Home() {
             ) : showEditForm ? (
               <form onSubmit={handleSubmitEdit} className="space-y-4">
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Username
                   </label>
                   <input
@@ -540,11 +644,16 @@ export default function Home() {
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter the username"
-                    disabled={localStorage.getItem('userType') !== 'support_user'}
+                    disabled={
+                      localStorage.getItem("userType") !== "support_user"
+                    }
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </label>
                   <input
@@ -559,7 +668,10 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Email
                   </label>
                   <input
@@ -574,7 +686,10 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="mobile"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Mobile
                   </label>
                   <input
@@ -590,7 +705,10 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Gender
                   </label>
                   <select
@@ -619,14 +737,30 @@ export default function Home() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Updating user...
                     </span>
                   ) : (
-                    'Update User'
+                    "Update User"
                   )}
                 </button>
                 <button
@@ -643,7 +777,10 @@ export default function Home() {
                 {isVendor && isLogin && (
                   <>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Email
                       </label>
                       <input
@@ -664,7 +801,10 @@ export default function Home() {
                 {isVendor && !isLogin && (
                   <>
                     <div>
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="username"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Name
                       </label>
                       <input
@@ -679,7 +819,10 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Email
                       </label>
                       <input
@@ -694,7 +837,10 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="gender"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Gender
                       </label>
                       <select
@@ -712,7 +858,10 @@ export default function Home() {
                       </select>
                     </div>
                     <div>
-                      <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="mobile"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Mobile
                       </label>
                       <input
@@ -728,7 +877,10 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label
+                        htmlFor="address"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
                         Address
                       </label>
                       <input
@@ -749,8 +901,11 @@ export default function Home() {
                 {!isVendor && (
                   <>
                     <div>
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                        {isVendor ? 'Name' : 'Username'}
+                      <label
+                        htmlFor="username"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        {isVendor ? "Name" : "Username"}
                       </label>
                       <input
                         type="text"
@@ -760,13 +915,18 @@ export default function Home() {
                         onChange={handleInputChange}
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder={isVendor ? 'Enter your name' : 'Enter your username'}
+                        placeholder={
+                          isVendor ? "Enter your name" : "Enter your username"
+                        }
                       />
                     </div>
                     {!isLogin && (
                       <>
                         <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
                             Email
                           </label>
                           <input
@@ -781,7 +941,10 @@ export default function Home() {
                           />
                         </div>
                         <div>
-                          <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            htmlFor="gender"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
                             Gender
                           </label>
                           <select
@@ -799,7 +962,10 @@ export default function Home() {
                           </select>
                         </div>
                         <div>
-                          <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label
+                            htmlFor="mobile"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                          >
                             Mobile
                           </label>
                           <input
@@ -821,7 +987,10 @@ export default function Home() {
 
                 {/* Password field for all cases */}
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Password
                   </label>
                   <input
@@ -849,14 +1018,32 @@ export default function Home() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
-                      {isLogin ? 'Signing in...' : 'Creating account...'}
+                      {isLogin ? "Signing in..." : "Creating account..."}
                     </span>
+                  ) : isLogin ? (
+                    "Sign In"
                   ) : (
-                    isLogin ? 'Sign In' : 'Create Account'
+                    "Create Account"
                   )}
                 </button>
               </form>
@@ -864,12 +1051,14 @@ export default function Home() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                {isLogin
+                  ? "Don't have an account? "
+                  : "Already have an account? "}
                 <button
                   onClick={() => setIsLogin(!isLogin)}
                   className="text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  {isLogin ? 'Sign up' : 'Sign in'}
+                  {isLogin ? "Sign up" : "Sign in"}
                 </button>
               </p>
             </div>
@@ -881,18 +1070,28 @@ export default function Home() {
       <div className="md:hidden w-full max-w-md mx-auto bg-gradient-to-r from-green-50 via-blue-50 to-indigo-100 rounded-3xl shadow-xl p-6 mt-12 mb-8 flex flex-col items-center animate-fade-in border border-indigo-100">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-green-600 text-3xl">♻️</span>
-          <h2 className="text-xl md:text-2xl font-bold text-indigo-700">Why is Waste Management Necessary?</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-indigo-700">
+            Why is Waste Management Necessary?
+          </h2>
         </div>
         <p className="text-gray-700 text-center text-base md:text-lg mt-2">
-          Effective waste management is crucial for protecting our environment, conserving natural resources, and ensuring public health. By properly sorting, recycling, and disposing of waste, we reduce pollution, save energy, and create a cleaner, more sustainable future for everyone.
+          Effective waste management is crucial for protecting our environment,
+          conserving natural resources, and ensuring public health. By properly
+          sorting, recycling, and disposing of waste, we reduce pollution, save
+          energy, and create a cleaner, more sustainable future for everyone.
         </p>
-        <blockquote className="italic text-indigo-600 mt-4 text-center text-sm md:text-base">“The greatest threat to our planet is the belief that someone else will save it.”</blockquote>
+        <blockquote className="italic text-indigo-600 mt-4 text-center text-sm md:text-base">
+          “The greatest threat to our planet is the belief that someone else
+          will save it.”
+        </blockquote>
       </div>
 
       {/* Footer */}
       <footer className="w-full mt-8 py-6 bg-white/80 backdrop-blur border-t border-indigo-100 flex flex-col items-center text-gray-500 text-sm">
         <div>© {new Date().getFullYear()} EcoWaste. All rights reserved.</div>
-        <div className="mt-1 italic text-green-700">Together, we build a cleaner future.</div>
+        <div className="mt-1 italic text-green-700">
+          Together, we build a cleaner future.
+        </div>
       </footer>
     </div>
   );
