@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import axios from "axios";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -210,7 +210,6 @@ export default function Home() {
         },
       );
 
-      console.log("User updated:", response.data);
       setError("User updated successfully!");
       setShowEditForm(false);
     } catch (err: any) {
@@ -251,7 +250,6 @@ export default function Home() {
         },
       );
 
-      console.log("Vendor updated:", response.data);
       setError("Vendor updated successfully!");
       setShowEditVendorForm(false);
     } catch (err: any) {

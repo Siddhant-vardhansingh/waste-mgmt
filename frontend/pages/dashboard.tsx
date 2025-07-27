@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 
 function formatDate(input: string): string {
   const date = new Date(input);
@@ -19,6 +19,7 @@ function formatDate(input: string): string {
 }
 
 export default function Dashboard() {
+  const [userRole, setUserRole] = useState("");
   const router = useRouter();
   const [showOrdersMenu, setShowOrdersMenu] = useState(false);
   const [showPastOrders, setShowPastOrders] = useState(false);
@@ -29,7 +30,6 @@ export default function Dashboard() {
     {},
   );
   const [pickupDate, setPickupDate] = useState("");
-  const [pickupAddress, setPickupAddress] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [itemQuantity, setItemQuantity] = useState(0.01);
@@ -64,6 +64,15 @@ export default function Dashboard() {
     fetchStateDistricts();
   }, []);
 
+  useEffect(() => {
+    const role = localStorage.getItem("userType");
+    setUserRole(role || "");
+
+    if (role === "vendor" || role === "support_vendor") {
+      handleGetPastOrders();
+    }
+  }, []);
+
   const handleGoHome = () => {
     router.push("/");
   };
@@ -78,10 +87,18 @@ export default function Dashboard() {
     setShowPastOrders(true);
     setShowCreateOrder(false);
     const token = localStorage.getItem("token");
+    const role = localStorage.getItem("userType");
+
     try {
-      const response = await axios.get("http://localhost:8002/orders", {
+      const endpoint =
+        role === "vendor" || role === "support_vendor"
+          ? "http://localhost:8002/vendor/order"
+          : "http://localhost:8002/orders";
+
+      const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setOrders(response.data.orders || []);
     } catch (err) {
       setOrders([]);
@@ -100,10 +117,6 @@ export default function Dashboard() {
     } catch (err) {
       setItemsData([]);
     }
-  };
-
-  const handleItemChange = (item: string, value: number) => {
-    setSelectedItems({ ...selectedItems, [item]: value });
   };
 
   const handleCategoryChange = (category: string) => {
@@ -134,7 +147,6 @@ export default function Dashboard() {
       return;
     }
     try {
-      console.log("Submitting order with items:", selectedItems);
       await axios.post(
         "http://localhost:8002/order",
         {
@@ -188,30 +200,32 @@ export default function Dashboard() {
       </header>
 
       {/* Main Actions Button Group - at the top */}
-      <div className="flex flex-wrap justify-center gap-8 mt-12 mb-12 animate-fade-in">
-        <button
-          onClick={handleShowOrdersMenu}
-          className="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-10 py-4 rounded-2xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all shadow-xl text-xl font-bold tracking-wide focus:outline-none focus:ring-2 focus:ring-purple-400"
-        >
-          <span className="text-2xl">📦</span> Orders
-        </button>
-        {showOrdersMenu && (
-          <>
-            <button
-              onClick={handleGetPastOrders}
-              className="flex items-center gap-3 bg-gradient-to-r from-green-500 to-green-400 text-white px-10 py-4 rounded-2xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all shadow-xl text-xl font-bold tracking-wide focus:outline-none focus:ring-2 focus:ring-green-400"
-            >
-              <span className="text-2xl">🕑</span> Get Past Orders
-            </button>
-            <button
-              onClick={handleShowCreateOrder}
-              className="flex items-center gap-3 bg-gradient-to-r from-indigo-500 to-blue-400 text-white px-10 py-4 rounded-2xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all shadow-xl text-xl font-bold tracking-wide focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            >
-              <span className="text-2xl">➕</span> Create Order
-            </button>
-          </>
-        )}
-      </div>
+      {userRole !== "vendor" && userRole !== "support_vendor" && (
+        <div className="flex flex-wrap justify-center gap-8 mt-12 mb-12 animate-fade-in">
+          <button
+            onClick={handleShowOrdersMenu}
+            className="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-500 text-white px-10 py-4 rounded-2xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all shadow-xl text-xl font-bold tracking-wide focus:outline-none focus:ring-2 focus:ring-purple-400"
+          >
+            <span className="text-2xl">📦</span> Orders
+          </button>
+          {showOrdersMenu && (
+            <>
+              <button
+                onClick={handleGetPastOrders}
+                className="flex items-center gap-3 bg-gradient-to-r from-green-500 to-green-400 text-white px-10 py-4 rounded-2xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all shadow-xl text-xl font-bold tracking-wide focus:outline-none focus:ring-2 focus:ring-green-400"
+              >
+                <span className="text-2xl">🕑</span> Get Past Orders
+              </button>
+              <button
+                onClick={handleShowCreateOrder}
+                className="flex items-center gap-3 bg-gradient-to-r from-indigo-500 to-blue-400 text-white px-10 py-4 rounded-2xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all shadow-xl text-xl font-bold tracking-wide focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              >
+                <span className="text-2xl">➕</span> Create Order
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Divider */}
       <div className="w-full max-w-2xl border-t border-indigo-200 mb-12"></div>
