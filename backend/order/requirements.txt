@@ -5,6 +5,9 @@ pymysql
 python-dotenv
 cryptography
 requests
+pre-commit
+black
+flake8
 
 # Optional for background tasks and async DB ORM
 # celery

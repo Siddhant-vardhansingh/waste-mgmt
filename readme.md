@@ -90,3 +90,17 @@ MIT
 
 **To contribute:**  
 Fork the repo, create a branch, and submit a pull request.
+
+## Contributing
+
+All code must pass linting and formatting checks before PRs can be merged.
+
+- Python code: Black and Flake8 via pre-commit
+- Frontend code: Prettier and ESLint via pre-commit and CI
+
+To set up locally:
+
+```sh
+pip install pre-commit
+pre-commit install
+```
