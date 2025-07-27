@@ -31,6 +31,20 @@ def get_current_user(authorization: str = Header(...)):
     return response.json()
 
 
+def get_current_vendor(authorization: str = Header(...)):
+    # Expect header: Authorization: Bearer <token>
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid authorization header")
+    token = authorization.split(" ", 1)[1]
+    response = requests.get(
+        "http://backend-auth:8000/vendor/me",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if response.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return response.json()
+
+
 app = FastAPI(title="Order Service")
 
 # Enable CORS
@@ -247,3 +261,29 @@ def get_orders(
             }
         )
     return {"status": "success", "orders": result}
+
+
+@app.get("/vendor/order")
+def get_vendor_orders(
+    db: Session = Depends(get_db), current_vendor: Dict = Depends(get_current_vendor)
+):
+    address = current_vendor.get("address")
+    user_id = current_vendor.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID not found in token")
+
+    orders = db.query(Order).filter(Order.pickup_address == address).all()
+    results = []
+    for order in orders:
+        results.append(
+            {
+                "order_id": str(UUID(bytes=order.id)),
+                "item_type": order.item_type,
+                "quantity": order.quantity,
+                "pickup_date": order.pickup_date,
+                "order_date": order.order_date,
+                "user_name": order.user_name,
+                "pickup_address": order.pickup_address,
+            }
+        )
+    return {"status": "success", "orders": results}

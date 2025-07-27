@@ -34,6 +34,12 @@ export default function Home() {
     gender: "",
     address: "",
   });
+  // State/District dropdown state for vendor signup
+  const [stateDistricts, setStateDistricts] = useState<{
+    [key: string]: string[];
+  }>({});
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -44,6 +50,31 @@ export default function Home() {
       setIsLoggedIn(true);
       setUserType(storedUserType || "");
     }
+  }, []);
+
+  // Fetch state/districts for vendor signup
+  useEffect(() => {
+    const fetchStateDistricts = async () => {
+      try {
+        const res = await fetch(
+          "https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json",
+        );
+        const json = await res.json();
+        const states = json.states;
+
+        const districtMap: { [key: string]: string[] } = {};
+        for (const entry of states) {
+          if (entry.state && Array.isArray(entry.districts)) {
+            districtMap[entry.state] = entry.districts;
+          }
+        }
+
+        setStateDistricts(districtMap);
+      } catch (err) {
+        console.error("Failed to fetch state/district data", err);
+      }
+    };
+    fetchStateDistricts();
   }, []);
 
   const handleInputChange = (
@@ -563,22 +594,56 @@ export default function Home() {
                   </select>
                 </div>
                 <div>
-                  <label
-                    htmlFor="address"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Address
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    State
                   </label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    value={editVendorFormData.address}
-                    onChange={handleEditVendorFormChange}
+                  <select
+                    name="state"
+                    value={selectedState}
+                    onChange={(e) => {
+                      setSelectedState(e.target.value);
+                      setSelectedDistrict("");
+                      setEditVendorFormData((prev) => ({
+                        ...prev,
+                        address: `${e.target.value},`,
+                      }));
+                    }}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter the address"
-                  />
+                  >
+                    <option value="">Select state</option>
+                    {Object.keys(stateDistricts).map((state) => (
+                      <option key={state} value={state}>
+                        {state}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    District
+                  </label>
+                  <select
+                    name="district"
+                    value={selectedDistrict}
+                    onChange={(e) => {
+                      setSelectedDistrict(e.target.value);
+                      setEditVendorFormData((prev) => ({
+                        ...prev,
+                        address: `${e.target.value}, ${selectedState}`,
+                      }));
+                    }}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    disabled={!selectedState}
+                  >
+                    <option value="">Select district</option>
+                    {(stateDistricts[selectedState] || []).map((district) => (
+                      <option key={district} value={district}>
+                        {district}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
@@ -876,23 +941,60 @@ export default function Home() {
                         placeholder="Enter your mobile number"
                       />
                     </div>
+                    {/* State and District dropdowns for address */}
                     <div>
-                      <label
-                        htmlFor="address"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Address
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        State
                       </label>
-                      <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
+                      <select
+                        name="state"
+                        value={selectedState}
+                        onChange={(e) => {
+                          setSelectedState(e.target.value);
+                          setSelectedDistrict("");
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: `${e.target.value},`,
+                          }));
+                        }}
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter your address"
-                      />
+                      >
+                        <option value="">Select state</option>
+                        {Object.keys(stateDistricts).map((state) => (
+                          <option key={state} value={state}>
+                            {state}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        District
+                      </label>
+                      <select
+                        name="district"
+                        value={selectedDistrict}
+                        onChange={(e) => {
+                          setSelectedDistrict(e.target.value);
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: `${e.target.value}, ${selectedState}`,
+                          }));
+                        }}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        disabled={!selectedState}
+                      >
+                        <option value="">Select district</option>
+                        {(stateDistricts[selectedState] || []).map(
+                          (district) => (
+                            <option key={district} value={district}>
+                              {district}
+                            </option>
+                          ),
+                        )}
+                      </select>
                     </div>
                   </>
                 )}
