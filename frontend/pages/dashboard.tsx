@@ -1,6 +1,22 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+
+function formatDate(input: string): string {
+  const date = new Date(input);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12 || 12;
+  const formattedTime = `${hours}:${minutes} ${ampm}`;
+
+  return `${day}/${month}/${year} ${formattedTime}`;
+}
 
 export default function Dashboard() {
   const router = useRouter();
@@ -13,6 +29,7 @@ export default function Dashboard() {
     {},
   );
   const [pickupDate, setPickupDate] = useState("");
+  const [pickupAddess, setPickupAddress] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [itemQuantity, setItemQuantity] = useState(0.01);
@@ -88,6 +105,7 @@ export default function Dashboard() {
         {
           items: selectedItems,
           pickup_date: pickupDate,
+          pickup_address: pickupAddess,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -198,13 +216,19 @@ export default function Dashboard() {
                         <span className="font-semibold text-gray-700">
                           Pickup Date:
                         </span>{" "}
-                        {order.pickup_date}
+                        {formatDate(order.pickup_date)}
                       </div>
                       <div className="flex-1">
                         <span className="font-semibold text-gray-700">
                           Order Date:
                         </span>{" "}
-                        {order.order_date}
+                        {formatDate(order.order_date)}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-700">
+                          Pickup Address:
+                        </span>{" "}
+                        {order.pickup_address}
                       </div>
                     </div>
                   </li>
@@ -310,6 +334,18 @@ export default function Dashboard() {
                 type="datetime-local"
                 value={pickupDate}
                 onChange={(e) => setPickupDate(e.target.value)}
+                className="border px-3 py-3 rounded-xl w-full focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all text-lg"
+                required
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block mb-2 font-semibold text-lg">
+                Pickup Address
+              </label>
+              <input
+                type="text"
+                value={pickupAddess}
+                onChange={(e) => setPickupAddress(e.target.value)}
                 className="border px-3 py-3 rounded-xl w-full focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all text-lg"
                 required
               />
