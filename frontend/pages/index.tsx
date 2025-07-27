@@ -292,376 +292,142 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" style={{backgroundColor: '#f0f9ff'}}>
-      {/* Dashboard Button - Only show when logged in */}
-      {isLoggedIn && (
-        <div className="absolute top-4 left-4">
-          <button
-            onClick={handleGoToDashboard}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-          >
-            Dashboard
-          </button>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header Bar */}
+      <header className="w-full sticky top-0 z-20 bg-white/80 backdrop-blur shadow-md flex flex-col md:flex-row items-center justify-between px-8 py-4 mb-8">
+        <div className="flex items-center gap-3">
+          <span className="text-green-600 text-3xl">♻️</span>
+          <span className="text-2xl font-extrabold text-indigo-700 tracking-tight">EcoWaste</span>
         </div>
-      )}
-      {/* Edit User Button - Only show for user/support_user */}
-      {isLoggedIn && (userType === 'user' || userType === 'support_user') && (
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={handleEditUser}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
-          >
-            Edit User
-          </button>
-        </div>
-      )}
-      {/* Edit Vendor Button - Only show for vendor/support_vendor */}
-      {isLoggedIn && (userType === 'vendor' || userType === 'support_vendor') && (
-        <div className="absolute top-20 right-4">
-          <button
-            onClick={handleEditVendor}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors shadow-lg"
-          >
-            Edit Vendor
-          </button>
-        </div>
-      )}
+        <div className="mt-2 md:mt-0 text-indigo-600 font-semibold text-lg">Empowering a Cleaner Tomorrow</div>
+      </header>
 
-      {/* Card with animated fade-in */}
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 animate-fade-in">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Waste Management
-          </h1>
-          <p className="text-gray-600">
-            {isLogin ? 'Welcome back! Please sign in.' : 'Create your account'}
-          </p>
-        </div>
-
-        {/* User Type Toggle - Large pill with icons */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex rounded-full bg-blue-100 p-1 shadow-lg">
-            <button
-              type="button"
-              onClick={() => setIsVendor(false)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-                ${!isVendor ? 'bg-blue-600 text-white shadow' : 'text-blue-600 hover:bg-blue-200'}`}
-            >
-              <span role="img" aria-label="User">👤</span> User
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsVendor(true)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-                ${isVendor ? 'bg-blue-600 text-white shadow' : 'text-blue-600 hover:bg-blue-200'}`}
-            >
-              <span role="img" aria-label="Vendor">🏢</span> Vendor
-            </button>
+      {/* Main Content: Two-column layout */}
+      <main className="flex-1 flex flex-col md:flex-row items-center justify-center gap-12 px-4 w-full max-w-5xl mx-auto">
+        {/* Left: Illustration and message */}
+        <div className="hidden md:flex flex-col items-center justify-center flex-1 animate-fade-in">
+          <div className="bg-gradient-to-br from-green-100 via-blue-100 to-indigo-100 rounded-3xl shadow-xl p-8 flex flex-col items-center border border-indigo-100">
+            <span className="text-green-500 text-7xl mb-4">🌱</span>
+            <h2 className="text-2xl font-bold text-indigo-800 mb-2 text-center">Join the Movement for a Greener Planet</h2>
+            <p className="text-gray-700 text-center text-lg mb-2">Every small step in waste management leads to a cleaner, healthier world. Sign up or log in to make a difference today!</p>
+            <blockquote className="italic text-indigo-600 mt-2 text-center text-base">“The Earth is what we all have in common.”</blockquote>
           </div>
         </div>
-
-        {/* Login/Signup Toggle - Outlined tab style */}
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex rounded-lg border border-gray-300 bg-gray-50 shadow-sm">
-            <button
-              type="button"
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 min-w-[100px] px-5 py-2 rounded-l-lg text-base font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
-                ${isLogin ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-100'}`}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 min-w-[100px] px-5 py-2 rounded-r-lg text-base font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
-                ${!isLogin ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-100'}`}
-            >
-              Sign Up
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        {showEditVendorForm ? (
-          <form onSubmit={handleSubmitEditVendor} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={editVendorFormData.name}
-                onChange={handleEditVendorFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the vendor name"
-                disabled={localStorage.getItem('userType') !== 'support_vendor'}
-              />
+        {/* Right: Auth Card */}
+        <div className="flex-1 flex flex-col items-center w-full animate-fade-in">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Waste Management
+              </h1>
+              <p className="text-gray-600">
+                {isLogin ? 'Welcome back! Please sign in.' : 'Create your account'}
+              </p>
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={editVendorFormData.password}
-                onChange={handleEditVendorFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the password"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={editVendorFormData.email}
-                onChange={handleEditVendorFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the email"
-                disabled={localStorage.getItem('userType') !== 'support_vendor'}
-              />
-            </div>
-            <div>
-              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
-                Mobile
-              </label>
-              <input
-                type="tel"
-                id="mobile"
-                name="mobile"
-                value={editVendorFormData.mobile}
-                onChange={handleEditVendorFormChange}
-                required
-                pattern="[0-9]{10,15}"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the mobile number"
-              />
-            </div>
-            <div>
-              <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-                Gender
-              </label>
-              <select
-                id="gender"
-                name="gender"
-                value={editVendorFormData.gender}
-                onChange={handleEditVendorFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Address
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={editVendorFormData.address}
-                onChange={handleEditVendorFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the address"
-              />
-            </div>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Updating vendor...
-                </span>
-              ) : (
-                'Update Vendor'
+            {/* Top Action Buttons */}
+            <div className="flex flex-col gap-3 mb-6 animate-fade-in">
+              {isLoggedIn && (
+                <button
+                  onClick={handleGoToDashboard}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-lg font-semibold tracking-wide"
+                >
+                  Dashboard
+                </button>
               )}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowEditVendorForm(false)}
-              className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-            >
-              Cancel
-            </button>
-          </form>
-        ) : showEditForm ? (
-          <form onSubmit={handleSubmitEdit} className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={editFormData.username}
-                onChange={handleEditFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the username"
-                disabled={localStorage.getItem('userType') !== 'support_user'}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={editFormData.password}
-                onChange={handleEditFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the password"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={editFormData.email}
-                onChange={handleEditFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the email"
-              />
-            </div>
-            <div>
-              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
-                Mobile
-              </label>
-              <input
-                type="tel"
-                id="mobile"
-                name="mobile"
-                value={editFormData.mobile}
-                onChange={handleEditFormChange}
-                required
-                pattern="[0-9]{10,15}"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter the mobile number"
-              />
-            </div>
-            <div>
-              <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-                Gender
-              </label>
-              <select
-                id="gender"
-                name="gender"
-                value={editFormData.gender}
-                onChange={handleEditFormChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Updating user...
-                </span>
-              ) : (
-                'Update User'
+              {isLoggedIn && (userType === 'user' || userType === 'support_user') && (
+                <button
+                  onClick={handleEditUser}
+                  className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-all shadow-lg font-semibold tracking-wide"
+                >
+                  Edit User
+                </button>
               )}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowEditForm(false)}
-              className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-            >
-              Cancel
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Vendor Login: Email + Password only */}
-            {isVendor && isLogin && (
-              <>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              </>
-            )}
+              {isLoggedIn && (userType === 'vendor' || userType === 'support_vendor') && (
+                <button
+                  onClick={handleEditVendor}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all shadow-lg font-semibold tracking-wide"
+                >
+                  Edit Vendor
+                </button>
+              )}
+            </div>
 
-            {/* Vendor Signup: Name, Email, Gender, Mobile, Address, Password */}
-            {isVendor && !isLogin && (
-              <>
+            {/* User Type Toggle - Large pill with icons */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex rounded-full bg-blue-100 p-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => setIsVendor(false)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+                    ${!isVendor ? 'bg-blue-600 text-white shadow' : 'text-blue-600 hover:bg-blue-200'}`}
+                >
+                  <span role="img" aria-label="User">👤</span> User
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsVendor(true)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+                    ${isVendor ? 'bg-blue-600 text-white shadow' : 'text-blue-600 hover:bg-blue-200'}`}
+                >
+                  <span role="img" aria-label="Vendor">🏢</span> Vendor
+                </button>
+              </div>
+            </div>
+
+            {/* Login/Signup Toggle - Outlined tab style */}
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex rounded-lg border border-gray-300 bg-gray-50 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(true)}
+                  className={`flex-1 min-w-[100px] px-5 py-2 rounded-l-lg text-base font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
+                    ${isLogin ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-100'}`}
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(false)}
+                  className={`flex-1 min-w-[100px] px-5 py-2 rounded-r-lg text-base font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
+                    ${!isLogin ? 'bg-indigo-600 text-white shadow' : 'text-gray-700 hover:bg-indigo-100'}`}
+                >
+                  Sign Up
+                </button>
+              </div>
+            </div>
+
+            {/* Form */}
+            {showEditVendorForm ? (
+              <form onSubmit={handleSubmitEditVendor} className="space-y-4">
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                     Name
                   </label>
                   <input
                     type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
+                    id="name"
+                    name="name"
+                    value={editVendorFormData.name}
+                    onChange={handleEditVendorFormChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your name"
+                    placeholder="Enter the vendor name"
+                    disabled={localStorage.getItem('userType') !== 'support_vendor'}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={editVendorFormData.password}
+                    onChange={handleEditVendorFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter the password"
                   />
                 </div>
                 <div>
@@ -672,30 +438,13 @@ export default function Home() {
                     type="email"
                     id="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
+                    value={editVendorFormData.email}
+                    onChange={handleEditVendorFormChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your email"
+                    placeholder="Enter the email"
+                    disabled={localStorage.getItem('userType') !== 'support_vendor'}
                   />
-                </div>
-                <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-                    Gender
-                  </label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select your gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
                 </div>
                 <div>
                   <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
@@ -705,13 +454,31 @@ export default function Home() {
                     type="tel"
                     id="mobile"
                     name="mobile"
-                    value={formData.mobile}
-                    onChange={handleInputChange}
+                    value={editVendorFormData.mobile}
+                    onChange={handleEditVendorFormChange}
                     required
                     pattern="[0-9]{10,15}"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your mobile number"
+                    placeholder="Enter the mobile number"
                   />
+                </div>
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender
+                  </label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={editVendorFormData.gender}
+                    onChange={handleEditVendorFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
@@ -721,36 +488,196 @@ export default function Home() {
                     type="text"
                     id="address"
                     name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
+                    value={editVendorFormData.address}
+                    onChange={handleEditVendorFormChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your address"
+                    placeholder="Enter the address"
                   />
                 </div>
-              </>
-            )}
-
-            {/* User Login/Signup */}
-            {!isVendor && (
-              <>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating vendor...
+                    </span>
+                  ) : (
+                    'Update Vendor'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditVendorForm(false)}
+                  className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : showEditForm ? (
+              <form onSubmit={handleSubmitEdit} className="space-y-4">
                 <div>
                   <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                    {isVendor ? 'Name' : 'Username'}
+                    Username
                   </label>
                   <input
                     type="text"
                     id="username"
                     name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
+                    value={editFormData.username}
+                    onChange={handleEditFormChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder={isVendor ? 'Enter your name' : 'Enter your username'}
+                    placeholder="Enter the username"
+                    disabled={localStorage.getItem('userType') !== 'support_user'}
                   />
                 </div>
-                {!isLogin && (
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={editFormData.password}
+                    onChange={handleEditFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter the password"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={editFormData.email}
+                    onChange={handleEditFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter the email"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+                    Mobile
+                  </label>
+                  <input
+                    type="tel"
+                    id="mobile"
+                    name="mobile"
+                    value={editFormData.mobile}
+                    onChange={handleEditFormChange}
+                    required
+                    pattern="[0-9]{10,15}"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter the mobile number"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender
+                  </label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={editFormData.gender}
+                    onChange={handleEditFormChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating user...
+                    </span>
+                  ) : (
+                    'Update User'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditForm(false)}
+                  className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Vendor Login: Email + Password only */}
+                {isVendor && isLogin && (
                   <>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Vendor Signup: Name, Email, Gender, Mobile, Address, Password */}
+                {isVendor && !isLogin && (
+                  <>
+                    <div>
+                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your name"
+                      />
+                    </div>
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                         Email
@@ -800,66 +727,173 @@ export default function Home() {
                         placeholder="Enter your mobile number"
                       />
                     </div>
+                    <div>
+                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your address"
+                      />
+                    </div>
                   </>
                 )}
-              </>
+
+                {/* User Login/Signup */}
+                {!isVendor && (
+                  <>
+                    <div>
+                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                        {isVendor ? 'Name' : 'Username'}
+                      </label>
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder={isVendor ? 'Enter your name' : 'Enter your username'}
+                      />
+                    </div>
+                    {!isLogin && (
+                      <>
+                        <div>
+                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Enter your email"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                            Gender
+                          </label>
+                          <select
+                            id="gender"
+                            name="gender"
+                            value={formData.gender}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="">Select your gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+                            Mobile
+                          </label>
+                          <input
+                            type="tel"
+                            id="mobile"
+                            name="mobile"
+                            value={formData.mobile}
+                            onChange={handleInputChange}
+                            required
+                            pattern="[0-9]{10,15}"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Enter your mobile number"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+
+                {/* Password field for all cases */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter your password"
+                  />
+                </div>
+
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {isLogin ? 'Signing in...' : 'Creating account...'}
+                    </span>
+                  ) : (
+                    isLogin ? 'Sign In' : 'Create Account'
+                  )}
+                </button>
+              </form>
             )}
 
-            {/* Password field for all cases */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your password"
-              />
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                <button
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  {isLogin ? 'Sign up' : 'Sign in'}
+                </button>
+              </p>
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {isLogin ? 'Signing in...' : 'Creating account...'}
-                </span>
-              ) : (
-                isLogin ? 'Sign In' : 'Create Account'
-              )}
-            </button>
-          </form>
-        )}
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </button>
-          </p>
+          </div>
         </div>
+      </main>
+
+      {/* Waste Management Info Section - at the bottom for mobile */}
+      <div className="md:hidden w-full max-w-md mx-auto bg-gradient-to-r from-green-50 via-blue-50 to-indigo-100 rounded-3xl shadow-xl p-6 mt-12 mb-8 flex flex-col items-center animate-fade-in border border-indigo-100">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-green-600 text-3xl">♻️</span>
+          <h2 className="text-xl md:text-2xl font-bold text-indigo-700">Why is Waste Management Necessary?</h2>
+        </div>
+        <p className="text-gray-700 text-center text-base md:text-lg mt-2">
+          Effective waste management is crucial for protecting our environment, conserving natural resources, and ensuring public health. By properly sorting, recycling, and disposing of waste, we reduce pollution, save energy, and create a cleaner, more sustainable future for everyone.
+        </p>
+        <blockquote className="italic text-indigo-600 mt-4 text-center text-sm md:text-base">“The greatest threat to our planet is the belief that someone else will save it.”</blockquote>
       </div>
+
+      {/* Footer */}
+      <footer className="w-full mt-8 py-6 bg-white/80 backdrop-blur border-t border-indigo-100 flex flex-col items-center text-gray-500 text-sm">
+        <div>© {new Date().getFullYear()} EcoWaste. All rights reserved.</div>
+        <div className="mt-1 italic text-green-700">Together, we build a cleaner future.</div>
+      </footer>
     </div>
   );
 }
