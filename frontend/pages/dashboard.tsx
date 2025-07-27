@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 function formatDate(input: string): string {
@@ -29,10 +29,40 @@ export default function Dashboard() {
     {},
   );
   const [pickupDate, setPickupDate] = useState("");
-  const [pickupAddess, setPickupAddress] = useState("");
+  const [pickupAddress, setPickupAddress] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [itemQuantity, setItemQuantity] = useState(0.01);
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [stateDistricts, setStateDistricts] = useState<{
+    [state: string]: string[];
+  }>({});
+
+  useEffect(() => {
+    const fetchStateDistricts = async () => {
+      try {
+        const res = await fetch(
+          "https://raw.githubusercontent.com/sab99r/Indian-States-And-Districts/master/states-and-districts.json",
+        );
+        const json = await res.json();
+        const states = json.states;
+
+        const districtMap: { [key: string]: string[] } = {};
+        for (const entry of states) {
+          if (entry.state && Array.isArray(entry.districts)) {
+            districtMap[entry.state] = entry.districts;
+          }
+        }
+
+        setStateDistricts(districtMap);
+      } catch (err) {
+        console.error("Failed to fetch state/district data", err);
+      }
+    };
+
+    fetchStateDistricts();
+  }, []);
 
   const handleGoHome = () => {
     router.push("/");
@@ -90,6 +120,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleStateChange = (state: string) => {
+    setSelectedState(state);
+    setSelectedDistrict("");
+  };
+
   const handleCreateOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -105,7 +140,7 @@ export default function Dashboard() {
         {
           items: selectedItems,
           pickup_date: pickupDate,
-          pickup_address: pickupAddess,
+          pickup_address: `${selectedDistrict}, ${selectedState}`,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -342,13 +377,37 @@ export default function Dashboard() {
               <label className="block mb-2 font-semibold text-lg">
                 Pickup Address
               </label>
-              <input
-                type="text"
-                value={pickupAddess}
-                onChange={(e) => setPickupAddress(e.target.value)}
-                className="border px-3 py-3 rounded-xl w-full focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all text-lg"
-                required
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <select
+                    value={selectedState}
+                    onChange={(e) => handleStateChange(e.target.value)}
+                    className="border px-3 py-3 rounded-xl w-full focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all text-lg"
+                  >
+                    <option value="">State</option>
+                    {Object.keys(stateDistricts).map((state) => (
+                      <option key={state} value={state}>
+                        {state}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <select
+                    value={selectedDistrict}
+                    onChange={(e) => setSelectedDistrict(e.target.value)}
+                    className="border px-3 py-3 rounded-xl w-full focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all text-lg"
+                    disabled={!selectedState}
+                  >
+                    <option value="">District</option>
+                    {(stateDistricts[selectedState] || []).map((district) => (
+                      <option key={district} value={district}>
+                        {district}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
             <button
               type="submit"
