@@ -10,6 +10,9 @@ import requests
 from fastapi import Header
 from uuid import uuid4, UUID
 from datetime import datetime
+from fpdf import FPDF
+import os
+import base64
 
 DATABASE_URL = "mysql+pymysql://user:userpass@mysql:3306/waste_mgmt"
 engine = create_engine(DATABASE_URL)
@@ -225,11 +228,61 @@ def create_order(
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
+    # Generate PDF invoice
+    invoice_pdf = FPDF()
+    invoice_pdf.add_page()
+    invoice_pdf.set_font("Arial", "B", 16)
+    invoice_pdf.set_text_color(30, 30, 30)
+    invoice_pdf.cell(0, 10, txt="Waste Management Invoice", ln=True, align="C")
+    invoice_pdf.ln(10)
+
+    invoice_pdf.set_font("Arial", "", 12)
+    invoice_pdf.set_text_color(50, 50, 50)
+    invoice_pdf.cell(0, 10, txt=f"Username: {user}", ln=True)
+    invoice_pdf.cell(0, 10, txt=f"Pickup Address: {order.pickup_address}", ln=True)
+    invoice_pdf.cell(
+        0,
+        10,
+        txt=f"Pickup Date: {order.pickup_date.strftime('%Y-%m-%d %H:%M')}",
+        ln=True,
+    )
+    invoice_pdf.ln(10)
+
+    invoice_pdf.set_fill_color(200, 220, 255)
+    invoice_pdf.set_font("Arial", "B", 12)
+    invoice_pdf.cell(80, 10, "Item Type", 1, 0, "C", fill=True)
+    invoice_pdf.cell(40, 10, "Quantity", 1, 1, "C", fill=True)
+
+    invoice_pdf.set_font("Arial", "", 12)
+    for item in created_items:
+        invoice_pdf.cell(80, 10, item["item_type"], 1, 0)
+        invoice_pdf.cell(40, 10, str(item["quantity"]), 1, 1)
+
+    invoice_pdf.ln(10)
+    invoice_pdf.set_font("Arial", "I", 10)
+    invoice_pdf.set_text_color(100, 100, 100)
+    invoice_pdf.cell(
+        0,
+        10,
+        txt=f"Generated on {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}",
+        ln=True,
+        align="R",
+    )
+
+    # Save invoice
+    invoice_path = f"/tmp/invoice_{user_id}.pdf"
+    invoice_pdf.output(invoice_path)
+
+    with open(invoice_path, "rb") as f:
+        encoded_invoice = base64.b64encode(f.read()).decode("utf-8")
+    os.remove(invoice_path)
+
     return {
         "status": "success",
         "message": "Order created successfully",
         "user_id": user_id,
         "items": created_items,
+        "invoice_base64": encoded_invoice,
     }
 
 

@@ -147,7 +147,7 @@ export default function Dashboard() {
       return;
     }
     try {
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:8002/order",
         {
           items: selectedItems,
@@ -158,7 +158,22 @@ export default function Dashboard() {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      alert("Order created successfully!");
+      const base64String = response.data.invoice_base64;
+      const byteCharacters = atob(base64String);
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "invoice.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      alert("Order created successfully and invoice downloaded!");
       setShowCreateOrder(false);
       setSelectedItems({});
       setPickupDate("");
