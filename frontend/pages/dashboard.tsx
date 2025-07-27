@@ -26,7 +26,7 @@ export default function Dashboard() {
   const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [itemsData, setItemsData] = useState<any[]>([]);
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: number }>(
-    {}
+    {},
   );
   const [pickupDate, setPickupDate] = useState("");
   const [pickupAddess, setPickupAddress] = useState("");
@@ -109,7 +109,7 @@ export default function Dashboard() {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       alert("Order created successfully!");
       setShowCreateOrder(false);
@@ -279,7 +279,7 @@ export default function Dashboard() {
                   {selectedCategory &&
                     (
                       itemsData.find(
-                        (cat: any) => cat.category === selectedCategory
+                        (cat: any) => cat.category === selectedCategory,
                       )?.items || []
                     ).map((item: string) => (
                       <option key={item} value={item}>

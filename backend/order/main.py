@@ -191,7 +191,7 @@ def create_order(
             quantity=quantity,
             pickup_date=order.pickup_date,
             order_date=datetime.utcnow(),
-            pickup_address=order.pickup_address
+            pickup_address=order.pickup_address,
         )
         db.add(order_entry)
         db.flush()  # Get order_entry.id before commit
@@ -202,7 +202,7 @@ def create_order(
                 "quantity": quantity,
                 "pickup_date": order.pickup_date,
                 "order_date": datetime.utcnow(),
-                "pickup_address":order.pickup_address
+                "pickup_address": order.pickup_address,
             }
         )
     try:
@@ -243,7 +243,7 @@ def get_orders(
                 "pickup_date": order.pickup_date,
                 "order_date": order.order_date,
                 "user_name": order.user_name,
-                "pickup_address": order.pickup_address
+                "pickup_address": order.pickup_address,
             }
         )
     return {"status": "success", "orders": result}
