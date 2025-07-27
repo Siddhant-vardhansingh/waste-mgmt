@@ -25,8 +25,8 @@ waste-management/
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/<your-username>/waste-management.git
-   cd waste-management
+   git clone https://github.com/Siddhant-vardhansingh/waste-mgmt.git
+   cd waste-mgmt
    ```
 
 2. **Run all services:**
