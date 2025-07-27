@@ -18,7 +18,7 @@ repos:
       - id: check-yaml
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.2.5
+    rev: v3.0.0 # Use a valid tag, e.g., v3.0.0
     hooks:
       - id: prettier
         files: \.(js|ts|jsx|tsx|json|css|md)$
