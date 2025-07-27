@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import create_engine, Column, String, Integer, DateTime
+from sqlalchemy import create_engine, Column, String, Integer, DateTime, Float
 from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 import requests
@@ -55,7 +55,7 @@ class Order(Base):
     user_id = Column(BINARY(16))
     user_name = Column(String(255))
     item_type = Column(String(255))
-    quantity = Column(Integer)
+    quantity = Column(Float)
     pickup_date = Column(DateTime)
     order_date = Column(DateTime)
 
@@ -154,10 +154,8 @@ def get_items():
 
 # Endpoint to create a new order
 class OrderRequest(BaseModel):
-    items: dict[str, int]  # Key: item name, Value: quantity
+    items: dict[str, float]  # Key: item name, Value: quantity
     pickup_date: datetime
-
-from uuid import UUID
 
 @app.post("/order")
 def create_order(
@@ -178,7 +176,7 @@ def create_order(
 
     created_items = []
     for item_type, quantity in order.items.items():
-        if not isinstance(quantity, int) or quantity <= 0:
+        if not isinstance(quantity, float) or quantity <= 0:
             raise HTTPException(status_code=422, detail=f"Invalid quantity for {item_type}")
         order_entry = Order(user_name=user, user_id=user_id_bytes, item_type=item_type, quantity=quantity, pickup_date=order.pickup_date, order_date=datetime.utcnow())
         db.add(order_entry)
@@ -201,4 +199,35 @@ def create_order(
         "message": "Order created successfully",
         "user_id": user_id,
         "items": created_items
+    }
+
+
+@app.get("/orders")
+def get_orders(
+    db: Session = Depends(get_db),
+    current_user: Dict = Depends(get_current_user)
+):
+    user_id = current_user.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID not found in token")
+
+    try:
+        user_id_bytes = UUID(user_id).bytes
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid user_id format")
+
+    orders = db.query(Order).filter(Order.user_id == user_id_bytes).all()
+    result = []
+    for order in orders:
+        result.append({
+            "order_id": str(UUID(bytes=order.id)),
+            "item_type": order.item_type,
+            "quantity": order.quantity,
+            "pickup_date": order.pickup_date,
+            "order_date": order.order_date,
+            "user_name": order.user_name
+        })
+    return {
+        "status": "success",
+        "orders": result
     }
