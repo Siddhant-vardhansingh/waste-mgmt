@@ -294,6 +294,12 @@ export default function Dashboard() {
                         </span>{" "}
                         {order.pickup_address}
                       </div>
+                      <div className="flex-1">
+                        <span className="font-semibold text-gray-700">
+                          User:
+                        </span>{" "}
+                        {order.user_name}
+                      </div>
                     </div>
                   </li>
                 ))}
